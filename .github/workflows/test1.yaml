@@ -1,0 +1,52 @@
+name: ccc
+
+on:
+  push:
+
+env:
+  mascot: Mona
+
+jobs:
+  local_action:
+    runs-on: ubuntu-latest
+    env:
+      AAA: "111"
+    outputs:
+      output1: ${{ steps.stepid.outputs.test }}
+    steps:
+      - run: ip a
+      - run: |
+          echo "ccccc"
+          echo ${{ github.ref }}
+          echo ${{ github.run_id }}
+      - id: stepid
+        run: echo "::set-output name=test::123"
+      - run: echo hello > world.txt
+      - uses: actions/upload-artifact@v3
+        with:
+          name: my-artifact
+          path: world.txt
+
+  mul_job1:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          RESULT=${{ github.ref }}
+          echo $RESULT
+      - run: echo ${{ github.jobs.local_action.name }}
+      - run: echo "Hi ${{ env.mascot }}"
+      - run: |
+          OUTPUT=${{ github.jobs.local_action.outputs.output1 }}
+          echo $OUTPUT
+
+  call_other:
+    needs: local_action
+    uses: ./.github/workflows/workflow-b.yaml
+    with:
+      varstr: "bbbb"
+
+  call_other2:
+    needs: local_action
+    uses: ./.github/workflows/workflow-b.yaml
+    with:
+      varstr: "ccc"
