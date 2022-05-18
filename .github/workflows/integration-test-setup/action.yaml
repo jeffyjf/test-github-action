@@ -1,0 +1,8 @@
+name: Cluster Setup
+description: Cluster setup for integration test
+
+runs:
+  using: "composite"
+  steps:
+  - name: Create kind cluster
+    uses: helm/kind-action@v1.2.0
