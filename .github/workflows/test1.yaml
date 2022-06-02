@@ -1,29 +1,17 @@
 name: test workflow
 
 on:
-  push:
-
-defaults:
-  run:
-    # reference: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#using-a-specific-shell
-    shell: bash --noprofile --norc -eo pipefail -x {0}
+  release:
+    types:
+      - "published"
 
 jobs:
-  TestCephHelmSuite:
+  test_release_published:
     runs-on: ubuntu-20.04
     strategy:
-      fail-fast: false
       matrix:
-        kubernetes-versions : ['v1.23.0']
+        value: ${{ github.event.release.assets }}
     steps:
-    - name: checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-
-    - name: setup cluster resources
-      uses: ./.github/workflows/integration-test-setup
-
-    - name: setup tmate session for debugging when event is PR
-      uses: mxschmitt/action-tmate@v3
-      timeout-minutes: 120
+      - name: Dump trigger event
+        run: |
+          echo '${{ matrix.value.browser_download_url }}'
